@@ -8,58 +8,59 @@
   <div id="chartArea"></div>
   <script type="text/javascript">
     // create testData for use until Python script is hooked up
-    var testData1 = [5,2,6,8,5,6,2,4];
-    var testData2 = [3,66,7,4,5,88,7,1,22];
+    var testData1 = [5,2,6,8,9,7,3,4];
+    var testData2 = [3,66,7,4,5,88,17,1,22];
     var testData3 = [5,34,235,77,99,237,66];
 
     // create our dimensions, canvas, etc.
-    var width = 960;
-    var height = 500;
+    var margin = {
+      top: 20,
+      right: 30,
+      left: 30,
+      bottom: 40
+    };
+    var width = 960 - margin.left - margin.right;
+    var height = 500 - margin.top - margin.bottom;
     var currentDataset = testData1;
+    var barWidth = width / currentDataset.length;
+    var padding = 2;
+
+    var xAxisLabel = currentDataset.map(function(datapoint, index) {
+      return index;
+    });
+
+    // create yScale to scale y-axis properly
+    var yScale = d3.scale.linear()
+      .domain([0, d3.max(currentDataset)])
+      .range([height, 0]);
+
+    // create xScale to scale x-axis with values
+    var xScale = d3.scale.ordinal()
+        .domain(xAxisLabel)
+        .rangeRoundBands([0, width], .1);
 
     var svg = d3.select('#chartArea')
       .append('svg')
-      .attr('width', width)
-      .attr('height', height);
+      .attr('width', width + margin.left + margin.right)
+      .attr('height', height + margin.top + margin.bottom);
 
-    // add our data to the chart
-    svg.selectAll('rect')
+    var bar = svg.selectAll('g')
       .data(currentDataset)
       .enter()
-      .append('rect')
-      .attr('x', function(d, i) {
-        return i * (width / currentDataset.length);
-      })
+      .append('g')
+      .attr('transform', function(d, i) {
+        return 'translate(' + xScale(i) + ',0)';
+      });
+
+    bar.append('rect')
       .attr('y', function(d) {
-        return height - d * 10;
+        return yScale(d);
       })
-      .attr('width', (width / currentDataset.length) - 1)
+      .attr('width', xScale.rangeBand())
       .attr('height', function(d) {
-        return d * 10;
+        return height - yScale(d);
       })
       .attr('fill', 'green');
-
-    // add labels to our chart
-    svg.selectAll('text')
-      .data(currentDataset)
-      .enter()
-      .append('text')
-      .text(function(d) {
-        return d;
-      })
-      .attr('x', function(d, i) {
-        return i * (width / currentDataset.length) + (width / currentDataset.length) / 2;
-      })
-      .attr('y', function(d) {
-        return height - d * 10 + 15;
-      })
-      .attr('font-family', 'sans-serif')
-      .attr('font-size', '15px')
-      .attr('fill', 'white')
-      .attr('text-anchor', 'middle');
-
-
-
   </script>
 </body>
 </html>
