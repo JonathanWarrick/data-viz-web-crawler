@@ -42,7 +42,8 @@
       };
       var width = 960 - margin.left - margin.right;
       var height = 500 - margin.top - margin.bottom;
-      var currentDataset = testData1;
+      var currentDataset = dataset[Object.keys(dataset)[0]];
+      console.log(currentDataset);
       var barWidth = width / currentDataset.length;
       var padding = 2;
 
@@ -111,7 +112,7 @@
         .style('text-anchor', 'end')
         .text('Frequency');
     };
-    allD3Stuff(testData1);
+    allD3Stuff({{data|safe}});
   </script>
 </body>
 </html>
