@@ -3,64 +3,115 @@
 <head>
   <title>D3 - Data Driven Documents</title>
   <script src="http://cdnjs.cloudflare.com/ajax/libs/d3/3.3.13/d3.min.js"></script>
+  <style>
+    .axis text {
+      font: 10px sans-serif;
+    }
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+    .active {
+      fill: red;
+    }
+  </style>
 </head>
 <body>
-  <div id="chartArea"></div>
+  <svg class="chart"></svg>
+  <button type="button" onclick="update()">Don't Click me.</button>
   <script type="text/javascript">
+    var update = function() {
+      var datasets = ['testData1', 'testData2', 'testData3'];
+      var randomNum = Math.floor(Math.random() * datasets.length);
+      var dataset = datasets[randomNum];
+    }
     // create testData for use until Python script is hooked up
     var testData1 = [5,2,6,8,9,7,3,4];
     var testData2 = [3,66,7,4,5,88,17,1,22];
     var testData3 = [5,34,235,77,99,237,66];
 
-    // create our dimensions, canvas, etc.
-    var margin = {
-      top: 20,
-      right: 30,
-      left: 30,
-      bottom: 40
-    };
-    var width = 960 - margin.left - margin.right;
-    var height = 500 - margin.top - margin.bottom;
-    var currentDataset = testData1;
-    var barWidth = width / currentDataset.length;
-    var padding = 2;
+    var allD3Stuff = function(dataset) {
+      // create our dimensions, canvas, etc.
+      var margin = {
+        top: 20,
+        right: 30,
+        left: 30,
+        bottom: 40
+      };
+      var width = 960 - margin.left - margin.right;
+      var height = 500 - margin.top - margin.bottom;
+      var currentDataset = testData1;
+      var barWidth = width / currentDataset.length;
+      var padding = 2;
 
-    var xAxisLabel = currentDataset.map(function(datapoint, index) {
-      return index;
-    });
-
-    // create yScale to scale y-axis properly
-    var yScale = d3.scale.linear()
-      .domain([0, d3.max(currentDataset)])
-      .range([height, 0]);
-
-    // create xScale to scale x-axis with values
-    var xScale = d3.scale.ordinal()
-        .domain(xAxisLabel)
-        .rangeRoundBands([0, width], .1);
-
-    var svg = d3.select('#chartArea')
-      .append('svg')
-      .attr('width', width + margin.left + margin.right)
-      .attr('height', height + margin.top + margin.bottom);
-
-    var bar = svg.selectAll('g')
-      .data(currentDataset)
-      .enter()
-      .append('g')
-      .attr('transform', function(d, i) {
-        return 'translate(' + xScale(i) + ',0)';
+      var xAxisLabel = currentDataset.map(function(datapoint, index) {
+        return index;
       });
 
-    bar.append('rect')
-      .attr('y', function(d) {
-        return yScale(d);
-      })
-      .attr('width', xScale.rangeBand())
-      .attr('height', function(d) {
-        return height - yScale(d);
-      })
-      .attr('fill', 'green');
+      // create yScale to scale y-axis properly
+      var yScale = d3.scale.linear()
+        .domain([0, d3.max(currentDataset)])
+        .range([height, 0]);
+
+      // create xScale to scale x-axis with values
+      var xScale = d3.scale.ordinal()
+          .domain(xAxisLabel)
+          .rangeRoundBands([0, width], .1);
+
+      var xAxis = d3.svg.axis()
+        .scale(xScale)
+        .orient('bottom');
+
+      var yAxis = d3.svg.axis()
+        .scale(yScale)
+        .orient('left')
+        .ticks(10)
+
+      var chart = d3.select('.chart')
+        .attr('width', width + margin.left + margin.right)
+        .attr('height', height + margin.top + margin.bottom)
+        .append('g')
+        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+      chart.selectAll('.bar')
+        .data(currentDataset)
+        .enter()
+        .append('rect')
+        .attr('class', 'bar')
+        .attr('x', function(d, i) {
+          return xScale(i);
+        })
+        .attr('y', function(d) {
+          return yScale(d);
+        })
+        .attr('height', function(d) {
+          return height - yScale(d);
+        })
+        .attr('width', xScale.rangeBand())
+        .attr('fill', 'green')
+        .on('mouseover', function (d) {
+          d3.select(this).classed('active', true);
+        })
+        .on('mouseout', function (d) {
+          d3.select(this).classed('active', false);
+        })
+      
+      chart.append('g')
+        .attr('class', 'x axis')
+        .attr('transform', 'translate(0,' + height + ')')
+        .call(xAxis);
+
+      chart.append('g')
+        .attr('class', 'y axis')
+        .call(yAxis)
+        .append('text')
+        .attr('y', 6)
+        .style('text-anchor', 'end')
+        .text('Frequency');
+    };
+    allD3Stuff(testData1);
   </script>
 </body>
 </html>
