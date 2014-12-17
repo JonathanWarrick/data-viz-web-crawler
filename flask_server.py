@@ -7,7 +7,8 @@ app = Flask(__name__)
 def hello_world():
 	league_id = request.args.get('league_id')
 	if league_id:
-		return render_template('index.html', data=json.dumps(scrape(league_id)))
+		return render_template('index.html', data=scrape(league_id))
+		# return render_template('index.html', data=['test', 'test2', 'test3'])
 	else:
 		return render_template('formTemplate.html')
 

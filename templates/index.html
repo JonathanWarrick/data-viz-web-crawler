@@ -20,18 +20,12 @@
 </head>
 <body>
   <svg class="chart"></svg>
-  <button type="button" onclick="update()">Don't Click me.</button>
+  <select name="option" width="300px">
+  {% for team in data %}
+      <option name="{{team.name}}">{{team.name}}</option>
+  {% endfor %}
+  </select>
   <script type="text/javascript">
-    var update = function() {
-      var datasets = ['testData1', 'testData2', 'testData3'];
-      var randomNum = Math.floor(Math.random() * datasets.length);
-      var dataset = datasets[randomNum];
-    }
-    // create testData for use until Python script is hooked up
-    var testData1 = [5,2,6,8,9,7,3,4];
-    var testData2 = [3,66,7,4,5,88,17,1,22];
-    var testData3 = [5,34,235,77,99,237,66];
-
     var allD3Stuff = function(dataset) {
       // create our dimensions, canvas, etc.
       var margin = {
@@ -42,8 +36,7 @@
       };
       var width = 960 - margin.left - margin.right;
       var height = 500 - margin.top - margin.bottom;
-      var currentDataset = dataset[Object.keys(dataset)[0]];
-      console.log(currentDataset);
+      var currentDataset = dataset[1].scores;
       var barWidth = width / currentDataset.length;
       var padding = 2;
 
