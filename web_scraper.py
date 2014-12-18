@@ -10,7 +10,7 @@ def scrape(league_id):
 	league_scores = []
 	
 	# Loop through each team
-	for team_id in range(1, 12):
+	for team_id in range(1, 13):
 		# Make request
 		page = requests.get('http://games.espn.go.com/ffl/schedule?leagueId=' + league_id + '&teamId=' + str(team_id))
 		tree = html.fromstring(page.text)
@@ -30,5 +30,5 @@ def scrape(league_id):
 				'name': team_name,
 				'scores': weekly_scores
 				})
-			
+
 	return league_scores
