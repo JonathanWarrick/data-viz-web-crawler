@@ -20,7 +20,7 @@
 </head>
 <body>
   <svg class="chart"></svg>
-  <select name="option" width="300px" onchange="chartInstance.testUpdate(this.selectedIndex)">
+  <select name="option" width="300px" onchange="chartInstance.updateChart(this.selectedIndex)">
   {% for team in data %}
       <option name="{{team.name}}">{{team.name}}</option>
   {% endfor %}

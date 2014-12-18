@@ -91,7 +91,8 @@ var chartInstance = (function() {
         .style('text-anchor', 'end')
         .text('Frequency');
     },
-    testUpdate: function(datasetIndex) {
+    updateChart: function(datasetIndex) {
+      console.log(instanceDataset[datasetIndex].scores)
       chart.selectAll('.bar')
         .data(instanceDataset[datasetIndex].scores)
         .transition()
