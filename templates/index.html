@@ -94,8 +94,8 @@ d3Chart.create = function(el, props) {
   console.log(props);
   var svg = d3.select(el).append('svg')
     .attr('class', 'd3')
-    .attr('width', props.width - props.margin.left - props.margin.right)
-    .attr('height', props.height - props.margin.top - props.margin.bottom);
+    .attr('width', props.width + props.margin.left + props.margin.right)
+    .attr('height', props.height + props.margin.top + props.margin.bottom);
 
   svg.append('g')
     .attr('class', 'd3-points')
