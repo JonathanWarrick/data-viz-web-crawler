@@ -61,8 +61,6 @@ var Chart = React.createClass({
 var Selector = React.createClass({
   handleChange: function(e) {
     e.preventDefault();
-    console.log('handleChange called in Selector');
-    console.log(e.target.selectedIndex);
     this.props.onSelectChange(e.target.selectedIndex);
   },
   render: function() {
@@ -85,7 +83,6 @@ var Selector = React.createClass({
 var App = React.createClass({
   handleSelectChange: function(selectIndex) {
     // debugger;
-    console.log('test');
     var newIndex = selectIndex;
     this.setState({
       selectedIndex: newIndex,
@@ -96,7 +93,6 @@ var App = React.createClass({
         y: [newIndex, Math.max.apply(null, this.props.data[newIndex].scores)]
       }
     }, function() {
-      console.log(this.state, 'new state');
       this.render();
     });
   },
@@ -112,7 +108,6 @@ var App = React.createClass({
     };
   },
   render: function() {
-    console.log('render called', this.state.selectedIndex);
     var marginObj = {
       top: 20,
       right: 30,
@@ -146,6 +141,19 @@ d3Chart.create = function(el, props) {
   svg.append('g')
     .attr('class', 'd3-points')
     .attr('transform', 'translate(' + props.margin.left + ',' + props.margin.top + ')');
+
+  svg.append('g')
+    .attr('class', 'x axis')
+    .attr('transform', 'translate(0,' + props.height + ')')
+    .call(this.axes(el, props, this.scales(el, props)).x);
+
+  svg.append('g')
+    .attr('class', 'y axis')
+    .call(this.axes(el, props, this.scales(el, props)).y)
+    .append('text')
+    .attr('y', 6)
+    .style('text-anchor', 'end')
+    .text('Frequency');
 
   this.update(el, props);
 };
@@ -188,12 +196,16 @@ d3Chart.axes = function(el, props, scales) {
 d3Chart.plotPoints = function(el, props, scales, axes) {
   var g = d3.select(el).selectAll('.d3-points');
 
+  // DATA JOIN
   var dataPoint = g.selectAll('.d3-point')
-    .data(props.data)
-    .enter()
+    .data(props.data);
+
+  // ENTER
+  dataPoint.enter()
     .append('rect')
     .attr('class', 'd3-point');
 
+  // UPDATE + ENTER
   dataPoint.attr('x', function(d, i) {
     return scales.x(i);
   })
@@ -205,8 +217,15 @@ d3Chart.plotPoints = function(el, props, scales, axes) {
   })
   .attr('width', scales.x.rangeBand());
 
-  // dataPoint.exit()
-  //   .remove();
+  // EXIT
+  dataPoint.exit().remove();
+
+  // UPDATE AXES
+  g.selectAll('.x.axis')
+    .call(axes.x);
+
+  g.selectAll('.y.axis')
+    .call(axes.y);
 };
 
 var initialize = function(dataset) {
