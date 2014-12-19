@@ -11,15 +11,12 @@ var Chart = React.createClass({
     margin: React.PropTypes.object
   },
   componentWillMount: function() {
-    console.log('before will mount', this.props.width);
     this.props.width = this.props.width - this.props.margin.left - this.props.margin.right;
     this.props.height = this.props.height - this.props.margin.top - this.props.margin.bottom;
-    console.log('after will mount', this.props.width);
   },
   componentDidMount: function() {
     var el = this.getDOMNode();
     d3Chart.create(el, this.props);
-    console.log('did mount', this.props.width);
   },
   componentDidUpdate: function() {
     this.props.width = this.props.width - this.props.margin.left - this.props.margin.right;
@@ -43,9 +40,9 @@ var Selector = React.createClass({
     return (
       <div>
         <select name="option" width="300px" onChange={this.handleChange}>
-          {this.props.data.map(function(datapoint) {
+          {this.props.data.map(function(datapoint, index) {
             return (
-              <option name={datapoint}>
+              <option name={datapoint} key={index}>
                 {datapoint}
               </option>
             );
@@ -150,7 +147,6 @@ d3Chart.update = function(el, props) {
 };
 
 d3Chart.scales = function(el, props) {
-  console.log(props);
   var scales = {};
 
   scales.x = d3.scale.ordinal()
