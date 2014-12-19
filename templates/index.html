@@ -22,8 +22,10 @@
 </head>
 <body>
   <svg class="chart"></svg>
-  <script type="text/javascript" src="{{ url_for('static', filename='javascriptcode.js') }}"></script>
-  <script type="text/javascript">
+  <script type="text/jsx"
+          src="{{ url_for('static', filename='reactcode.js') }}"></script>
+  <script type="text/jsx">
+  /** @jsx React.DOM */
     initialize({{data|safe}});  
   </script>
 </body>
