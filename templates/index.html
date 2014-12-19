@@ -40,14 +40,19 @@ var Chart = React.createClass({
     margin: React.PropTypes.object
   },
   componentWillMount: function() {
+    console.log('before will mount', this.props.width);
     this.props.width = this.props.width - this.props.margin.left - this.props.margin.right;
     this.props.height = this.props.height - this.props.margin.top - this.props.margin.bottom;
+    console.log('after will mount', this.props.width);
   },
   componentDidMount: function() {
     var el = this.getDOMNode();
     d3Chart.create(el, this.props);
+    console.log('did mount', this.props.width);
   },
   componentDidUpdate: function() {
+    this.props.width = this.props.width - this.props.margin.left - this.props.margin.right;
+    this.props.height = this.props.height - this.props.margin.top - this.props.margin.bottom;
     var el = this.getDOMNode();
     d3Chart.update(el, this.props);
   },
@@ -142,14 +147,18 @@ d3Chart.create = function(el, props) {
     .attr('class', 'd3-points')
     .attr('transform', 'translate(' + props.margin.left + ',' + props.margin.top + ')');
 
+  var initialScales = this.scales(el, props);
+  var initialAxes = this.axes(el, props, initialScales);
+
   svg.append('g')
     .attr('class', 'x axis')
-    .attr('transform', 'translate(0,' + props.height + ')')
-    .call(this.axes(el, props, this.scales(el, props)).x);
+    .attr('transform', 'translate(' + props.margin.left + ',' + (props.margin.top + props.height) + ')')
+    .call(initialAxes.x);
 
   svg.append('g')
     .attr('class', 'y axis')
-    .call(this.axes(el, props, this.scales(el, props)).y)
+    .attr('transform', 'translate(' + props.margin.left + ',' + props.margin.top + ')')
+    .call(initialAxes.y)
     .append('text')
     .attr('y', 6)
     .style('text-anchor', 'end')
@@ -166,6 +175,7 @@ d3Chart.update = function(el, props) {
 };
 
 d3Chart.scales = function(el, props) {
+  console.log(props);
   var scales = {};
 
   scales.x = d3.scale.ordinal()
@@ -206,7 +216,8 @@ d3Chart.plotPoints = function(el, props, scales, axes) {
     .attr('class', 'd3-point');
 
   // UPDATE + ENTER
-  dataPoint.attr('x', function(d, i) {
+  dataPoint.transition()
+  .attr('x', function(d, i) {
     return scales.x(i);
   })
   .attr('y', function(d) {
