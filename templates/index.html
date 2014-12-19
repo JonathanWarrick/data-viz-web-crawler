@@ -39,6 +39,10 @@ var Chart = React.createClass({
     height: React.PropTypes.number,
     margin: React.PropTypes.object
   },
+  componentWillMount: function() {
+    this.props.width = this.props.width - this.props.margin.left - this.props.margin.right;
+    this.props.height = this.props.height - this.props.margin.top - this.props.margin.bottom;
+  },
   componentDidMount: function() {
     var el = this.getDOMNode();
     d3Chart.create(el, this.props);
@@ -54,19 +58,61 @@ var Chart = React.createClass({
   }
 });
 
+var Selector = React.createClass({
+  handleChange: function(e) {
+    e.preventDefault();
+    console.log('handleChange called in Selector');
+    console.log(e.target.selectedIndex);
+    this.props.onSelectChange(e.target.selectedIndex);
+  },
+  render: function() {
+    return (
+      <div>
+        <select name="option" width="300px" onChange={this.handleChange}>
+          {this.props.data.map(function(datapoint) {
+            return (
+              <option name={datapoint}>
+                {datapoint}
+              </option>
+            );
+          })}
+        </select>
+      </div>
+    );
+  }
+});
+
 var App = React.createClass({
-  getInitialState: function() {
-    return {
-      data: this.props.data,
+  handleSelectChange: function(selectIndex) {
+    // debugger;
+    console.log('test');
+    var newIndex = selectIndex;
+    this.setState({
+      selectedIndex: newIndex,
       domain: {
-        x: this.props.data.map(function(d, i) {
+        x: this.props.data[newIndex].scores.map(function(d, i) {
           return i;
         }),
-        y: [0, Math.max.apply(null, this.props.data)]
+        y: [newIndex, Math.max.apply(null, this.props.data[newIndex].scores)]
+      }
+    }, function() {
+      console.log(this.state, 'new state');
+      this.render();
+    });
+  },
+  getInitialState: function() {
+    return {
+      selectedIndex: 0,
+      domain: {
+        x: this.props.data[0].scores.map(function(d, i) {
+          return i;
+        }),
+        y: [0, Math.max.apply(null, this.props.data[0].scores)]
       }
     };
   },
   render: function() {
+    console.log('render called', this.state.selectedIndex);
     var marginObj = {
       top: 20,
       right: 30,
@@ -75,12 +121,13 @@ var App = React.createClass({
     };
     return (
       <div>
-        <Chart data={this.state.data}
+        <Chart data={this.props.data[this.state.selectedIndex].scores}
                domain={this.state.domain}
                width={960}
                height={500}
                margin={marginObj} 
         />
+        <Selector data={this.props.teamNames} onSelectChange={this.handleSelectChange} />
       </div>
     );
   }
@@ -91,7 +138,6 @@ var App = React.createClass({
 var d3Chart = {};
 
 d3Chart.create = function(el, props) {
-  console.log(props);
   var svg = d3.select(el).append('svg')
     .attr('class', 'd3')
     .attr('width', props.width + props.margin.left + props.margin.right)
@@ -140,7 +186,6 @@ d3Chart.axes = function(el, props, scales) {
 };
 
 d3Chart.plotPoints = function(el, props, scales, axes) {
-  console.log(arguments);
   var g = d3.select(el).selectAll('.d3-points');
 
   var dataPoint = g.selectAll('.d3-point')
@@ -160,15 +205,15 @@ d3Chart.plotPoints = function(el, props, scales, axes) {
   })
   .attr('width', scales.x.rangeBand());
 
-  dataPoint.exit()
-    .remove();
+  // dataPoint.exit()
+  //   .remove();
 };
 
 var initialize = function(dataset) {
-  React.render(<App data={dataset} />, document.body);
+  React.render(<App data={dataset} teamNames = {dataset.map(function(datapoint) { return datapoint.name; })} />, document.body);
 }
 
-initialize({{data[0].scores|safe}});
+initialize({{data|safe}});
   </script>
 </body>
 </html>

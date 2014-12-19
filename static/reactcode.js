@@ -7,14 +7,9 @@ var Chart = React.createClass({
 		height: React.PropTypes.number,
 		margin: React.PropTypes.object
 	},
-	componentWillMount: function() {
-		this.setProps({
-			width: this.props.width - this.props.margin.left - this.props.margin.right,
-			height: this.props.height - this.props.margin.top - this.props.margin.bottom
-		});
-	},
+
 	componentDidMount: function() {
-		console.log(this.state);
+		console.log(this.props);
 		var el = this.getDOMNode();
 		d3Chart.create(el, this.props, this.state)
 	},
